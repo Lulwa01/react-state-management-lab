@@ -1,13 +1,13 @@
 // src/App.jsx
 
+// import { use } from "react";
 import { useState } from "react";
+import './App.css'
 
 const App = () => {
-
-  // Create a new state variable named team and set the initial state to an empty array [].
   const [team, setTeam] = useState([])
   const [money, setMoney] = useState(100)
-  const [zombieFighters] = useState([
+  const [zombieFighters, setZombieFighters] = useState([
     {
       id: 1,
       name: 'Survivor',
@@ -90,38 +90,80 @@ const App = () => {
     },
   ])
 
-  const handleAddFighter = (fighter) => {
-    setTeam (fighter)
-    console.log(team)
-  }
+  const totalStrength = team.reduce((acc, fighter) => {
+    return acc + fighter.strength
+  }, 0)
 
-  const newZombieFighters = zombieFighters.filter(zombieFighter => (
-    zombieFighter.id !== fighter.id
-  ))
-
-  setZombieFighters(newZombieFighters)
+  const totalAgility = team.reduce((acc, fighter) => {
+    return acc + fighter.strength
+  }, 0)
 
   function handleAddFighter (fighter) {
     if (money < fighter.price) {
       console.log('not enough money')
-      return
+      return;
     }
+  
+    const newTeam = [...team, fighter]
+    setTeam(newTeam)
+
+    const newZombieFighters = zombieFighters.filter(zombieFighter => (
+      zombieFighter.id !== fighter.id
+    ))
+    setZombieFighters(newZombieFighters)
+
+    const newMoney = money - fighter.price
+    setMoney(newMoney)
+}
+
+  function handleRemoveFighter (fighter) {
+    const oldTeam = team.filter(teamMember => (
+      teamMember.id != fighter.id
+    ))
+    setTeam(oldTeam)
+
+    const oldZombieFighters = [...zombieFighters, fighter]
+    setZombieFighters(oldZombieFighters)
+  
+    const oldMoney = money + fighter.price
+    setMoney(oldMoney)
   }
 
-  
-
-  return (
-    <>
+return (
+  <>
     <h1>Zombie Fighters</h1>
-    <p>Money: {money}</p>
+    <h3>Money: {money}</h3>
+    <h3>Total Strength: {totalStrength}</h3>
+    <h3>Total Agility: {totalAgility}</h3>
+
+    <h3>Team</h3>
+
+    {team.length === 0 ? <p>Pick some team members!</p> : 
+        <ul>
+        {zombieFighters.map(fighter => (
+          <li key={fighter.id}>
+            <h3>{fighter.name}</h3>
+            <p>Price: {fighter.price}</p>
+            <p>Strength: {fighter.strength}</p>
+            <p>Agility: {fighter.agility}</p>
+            <img src={fighter.img} alt="zombie-fighter-image" />
+      <button onClick={() => handleAddFighter(fighter)}>Add</button>
+      <button onClick={() => handleRemoveFighter(fighter)} >Remove</button>
+          </li>
+        ))}
+      </ul>
+    }
+
+    <h3>Fighters</h3>
+
     <ul>
-      {zombieFighters.map((zombieFighter) => (
-        <li>
-          <h3>{zombieFighter.name}</h3>
-          <p>Price: {zombieFighter.price}</p>
-          <p>Strength: {zombieFighter.strength}</p>
-          <p>Agility: {zombieFighter.agility}</p>
-          <img src={zombieFighter.img} alt="zombie-fighter-image" />
+      {zombieFighters.map(fighter => (
+        <li key={fighter.id}>
+          <h3>{fighter.name}</h3>
+          <p>Price: {fighter.price}</p>
+          <p>Strength: {fighter.strength}</p>
+          <p>Agility: {fighter.agility}</p>
+          <img src={fighter.img} alt="zombie-fighter-image" />
     <button onClick={() => handleAddFighter(fighter)}>Add</button>
         </li>
       ))}
@@ -130,6 +172,5 @@ const App = () => {
     </>
   );
 }
-// console.log(removeKey)
 
 export default App
